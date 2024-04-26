@@ -1,5 +1,5 @@
-const asyncHandler = async (reqHandler) => {
-  (req, res, next) => {
+const asyncHandler = (reqHandler) => {
+  return (req, res, next) => {
     Promise.resolve(reqHandler(req, res, next)).catch((error) => next(error));
   };
 };
