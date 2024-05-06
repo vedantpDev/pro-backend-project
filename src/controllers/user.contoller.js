@@ -1,7 +1,10 @@
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { User } from "../models/user.model.js";
 import { ApiError } from "../utils/ApiError.js";
-import { uploadOnCloudinary } from "../utils/Cloudinary.js";
+import {
+  uploadOnCloudinary,
+  deleteFromCloudinary,
+} from "../utils/Cloudinary.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import jwt from "jsonwebtoken";
 
@@ -263,6 +266,15 @@ const updateUserAvatar = asyncHandler(async (req, res) => {
       throw new ApiError(400, "failed uploading avatar file");
     }
 
+    const user1 = await User.findById(req.user._id);
+
+    const deleteImgResponse = await deleteFromCloudinary(user1.avatar);
+    console.log("deleteImgResponse", deleteImgResponse);
+
+    if (!deleteImgResponse) {
+      throw new ApiError(400, "failed deleting avatar file on cloudinary");
+    }
+
     const user = await User.findByIdAndUpdate(
       req.user?._id,
       {
@@ -291,6 +303,15 @@ const updateUserCoverImg = asyncHandler(async (req, res) => {
 
     if (!coverImgCloudinaryUrl.url) {
       throw new ApiError(400, "failed uploading cover img file");
+    }
+
+    const user1 = await User.findById(req.user._id);
+
+    const deleteImgResponse = await deleteFromCloudinary(user1.coverImg);
+    console.log("deleteImgResponse", deleteImgResponse);
+
+    if (!deleteImgResponse) {
+      throw new ApiError(400, "failed deleting cover Image file on cloudinary");
     }
 
     const user = await User.findByIdAndUpdate(
